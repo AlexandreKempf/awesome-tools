@@ -10,7 +10,7 @@ revealOptions:
 # Text
 
 
-----
+----  
 ## el classico
 Paragraph with text.
 
@@ -68,7 +68,7 @@ link to [Google](https://www.google.com)
 
 ----
 ## image
-![alt text](bitmap.png) <!-- .element height="500px" width="500px" -->
+![alt text](bitmap.png)
 
 
 ----
@@ -77,9 +77,9 @@ link to [Google](https://www.google.com)
   <img width="460" height="300" src="http://www.fillmurray.com/460/300">
 </p>
 
-<img align="left" width="100" height="100" src="http://www.fillmurray.com/100/100">
+![alt text](bitmap.png) <!-- .element align="left" height="50px" width="50px" -->
 
-<img align="right" width="100" height="100" src="http://www.fillmurray.com/100/100">
+![alt text](bitmap.png) <!-- .element align="right" height="50px" width="50px" -->
 
 
 ----

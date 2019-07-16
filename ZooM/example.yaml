@@ -1,0 +1,62 @@
+datasets:
+  train:
+    generators:
+      - generate_classif_dataset:
+          folder:         /Datasets/csgo/weapons/3.0/train
+          nmax_per_class: 300
+          n_per_class:    300
+
+    modifiers:             # occurs before the general preprocess
+      - onehot_encoding:
+          n_class:        30
+
+  test:
+    generators:
+      - generate_classif_dataset:
+          folder:         /Datasets/csgo/weapons/3.0/test
+          nmax_per_class: 100
+          n_per_class:    100
+
+    modifiers:
+      - onehot_encoding:
+          n_class:        30
+
+
+model:
+  name:                   VGG
+  blueprint:
+
+  data_modifiers:
+    - clip:
+        min:              0
+        max:              1
+    - std_norm:
+        std:              4.05
+
+  target_modifiers:
+    - onehot_encoding:
+
+  init_weights:           /Weights/VGG16/pretrained_weights.hdf5
+
+  augmentations:
+    - add_gaussian_noise:
+        sometimes:        0.5
+        kwargs:
+          sigma:          3
+    - black_and_white:
+        sometimes:        0.5
+        kwargs:
+          centered:       True
+
+  metrics:
+    - from_yolo_to_bbox:
+        nb_anchors:       5
+
+  artifacts:
+    -
+
+
+experiment:
+  comment:                "with new augmenters"
+  nb_epoch:               70
+  validation_ration:      40%

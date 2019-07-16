@@ -1,0 +1,21 @@
+Dataset (hdf5):
+    data:
+    labels:
+    config: # config code from the yml file
+    id: # unique id for the dataset generated based on config
+    commits:
+        dvc: #the commit for pachyderm
+        pndvsn: #the commit for pandavision (for operators)
+        standard-models: # the commit for zoom
+    # if id and commits are the same -> don't generate the dataset again
+
+Model:
+    model:
+    weights:
+    config:
+    id:
+    commits:
+
+Weights (hdf5):
+    data:
+    id_xp: # id of the experiment that generated the file
