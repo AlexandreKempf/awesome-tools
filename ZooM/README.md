@@ -1,46 +1,21 @@
-# models
+# Flows:
+ - define by a yaml file
+ - contains a DAG of Ops and a list of module import
+ - should be saved everytime with the last git version of the import
+ - integrated with MLflow
+ - possibility of loops
 
-## And if
+# Dataset
+ - define by a yaml, with a list of paths and labels
+ - config files should be saved when a Flow runs it
 
-
-
-# weights
-
-# datasets
-  - a hdf5 file for trainset and a hdf5 file for testset
-  - hdf5 file with no `group` and two `datasets` inside : 'inputs' and 'outputs'
-  - good practise to add 'title', 'date', 'comment' as attributes
-
-# augmentation
-  - yaml format
-  - list of operators for augmentation
-  ```yaml
-    - name: AddGaussianNoise
-      sometimes: 0.5
-      kwargs:
-        sigma: 0.5
-
-    - name: AddWhiteNoise
-      sometimes: 0.5
-      kwargs:
-        range: (0, 10)
-  ```
-
-# preprocessing
-- yaml format
-- list of operators for preprocessing
-```yaml
-  - name: BlackAndWhite
-    kwargs:
-      centered: True
-```
-
-# target_transform
-- yaml format
-- list of operators for target_transform
-```yaml
-  - name: OneHot
-    kwargs:
-      nb_class: 50
-```
-- target transform hdf5 -> target and target -> hdf5
+# Ops
+ - work with the conventions:
+  - img:
+  - mask:
+  - index:
+  - batch:
+  - bbox:
+  - point:
+ - well documented
+ -

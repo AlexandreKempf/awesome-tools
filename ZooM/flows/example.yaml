@@ -1,0 +1,24 @@
+inputs: # inputs for the flow {variable_name: value}
+  path: /home/alex/awesome/ZooM/datasets/data.yaml
+
+outputs: # output of the flow [varialbe_name, ...]
+  - labels
+  - imgs
+
+modules: # module to import
+  - ops
+
+flow:
+  - # Load the YAML dataset cfg file
+    f: load_yaml
+    args: [path]
+    out: [classes, inputs, labels, root]
+
+  - # Show the posibility to have subflows
+    f: /home/alex/awesome/ZooM/flows/subflow.yaml
+    out: [imgs]
+
+  - # Load the targets as one_hot
+    f: one_hot
+    args: [labels]
+    out: [labels]

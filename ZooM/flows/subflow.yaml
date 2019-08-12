@@ -1,0 +1,15 @@
+inputs: # inputs for the flow {variable_name: value}
+  inputs: null
+  root: null
+
+outputs: # output of the flow [variable_name, ...]
+  - img
+
+modules: # module to import
+  - ops
+
+flow:
+  - # Load the images from the dataset
+    f: load_imgs
+    args: [inputs, root]
+    out: [img]
