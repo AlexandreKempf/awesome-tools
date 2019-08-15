@@ -3,69 +3,82 @@ import yaml
 from copy import deepcopy
 import importlib
 import os.path
+import numpy as np
+
+def load_module(module):
+    if isinstance(module, list):
+        ops = {}
+        for m in module:
+            ops.update(load_module(m))
+        return ops
+    else:
+        m = importlib.import_module(module)
+        funs = [f for f in getmembers(m) if isfunction(f[1])]
+        funs = {f[0]: f[1] for f in funs}
+        return funs
 
 
-def _load_module(module):
-    m = importlib.import_module(module)
-    funs = [f for f in getmembers(m) if isfunction(f[1])]
-    funs = {f[0]: f[1] for f in funs}
-    return funs
+def exec_block(block, dico, ops):
+    iargs = [deepcopy(dico[arg]) for arg in block.get('args', [])]
+    ikwargs = {k: deepcopy(v) for k, v in block.get('kwargs', {}).items()}
+    if os.path.isfile(block['f']):  # if subflow
+        out = run_config(block['f'], iargs, ikwargs, ops)
+    else:
+        ifun = ops[block['f']]
+        out = ifun(*iargs, **ikwargs)
+    iout = block.get('out', [])
+    if len(iout) == 1:
+        out = {iout[0]: out}
+    else:
+        out = {iout[i]: out[i] for i in range(len(iout))}
+    return out
 
 
-def load_modules(modules):
-    ops = {}
-    for module in modules:
-        ops.update(_load_module(module))
-    return ops
+def exec_loop_block(block, dico, ops):
+    variant = block.get('loop', [])
+    invariant = [arg for arg in block.get('args', []) if arg not in variant]
+    dico_loop = {k: v for k, v in block.get('kwargs', {}).items()}
+    dico_loop.update({k: deepcopy(dico[k]) for k in invariant})
+    # TODO check that all variant have the same len
+    out = {k: [] for k in block.get('out', [])}
+    for i in range(len(dico[variant[0]])):
+        dico_loop.update({k: deepcopy(dico[k][i]) for k in variant})
+        out_tmp = exec_block(block, dico_loop, ops)
+        for k in out.keys():
+            out[k].append(out_tmp[k])
+    return out
 
 
-def run_config(yaml_path, input_ref={'meta': {}}):
+def run_config(yaml_path, args=None, kwargs=None, ops=None):
+    if args is None:
+        args = []
+    if kwargs is None:
+        kwargs = {}
+    if ops is None:
+        ops = {}
+
     yaml_file = yaml.safe_load(open(yaml_path, 'r'))
-    ops = load_modules(yaml_file.get('modules', []))
+    ops.update(load_module(yaml_file.get('modules', [])))
 
-    # load dico_kwargs with a priority on the subflow inputs (except if None)
-    dico_kwargs = deepcopy(input_ref)
-    for k, v in yaml_file.get('inputs', {}).items():
-        if k in dico_kwargs:
-            if v is not None:
-                dico_kwargs[k] = v
-        else:
-            dico_kwargs[k] = v
-
-    # save config and metadata
-    dico_kwargs['meta']['config'] = dico_kwargs['meta'].get('config', {})
-    dico_kwargs['meta']['config'].update({yaml_path: yaml_file})
-    dico_kwargs['meta']['ops'] = dico_kwargs['meta'].get('ops', {})
-    dico_kwargs['meta']['ops'].update({yaml_path: ops})
+    name_args = yaml_file.get('args', [])
+    dico = {name_args[i]: arg for i, arg in enumerate(args)}  # match the args
+    dico.update({k: v for k, v in yaml_file.get('kwargs', {}).items()})  # fill kwargs with the subfile
+    dico.update({k: v for k, v in kwargs.items()}) # fill kwargs with the mainfile
 
     # execute the flow
     for iblock in yaml_file['flow']:
-
-        if os.path.isfile(iblock['f']): # if subflow
-            output = run_config(iblock['f'], dico_kwargs)
-            iout = iblock.get('out', [])
-            iout.append('meta')
-
+        if iblock.get('loop', None) is None:
+            out = exec_block(iblock, dico, ops)
         else:
-            iargs = [dico_kwargs[a] for a in iblock.get('args', [])]
-            ikwargs = iblock.get('kwargs', {})
-            ifun = ops[iblock['f']]
-            output = ifun(*iargs, **ikwargs)
+            out = exec_loop_block(iblock, dico, ops)
+        dico.update(out)
 
-            iout = iblock.get('out', [])
-
-        if len(iout) == 1:
-            output = {iblock['out'][0]: output}
-        else:
-            output = {iblock['out'][i]: output[i] for i in range(len(iblock['out']))}
-
-        dico_kwargs.update(output)
-
-    # prepare the output, force meta in the output
-    config_out = yaml_file.get('outputs', [])
-    if not 'meta' in config_out:
-        config_out.append('meta')
-    return [dico_kwargs[v] for v in config_out]
+    # prepare the output
+    config_out = yaml_file.get('out', [])
+    if len(config_out) == 1:
+        return dico[config_out[0]]
+    else:
+        return [dico[v] for v in config_out]
 
 
 yaml_path = '/home/alex/awesome/ZooM/flows/example.yaml'
