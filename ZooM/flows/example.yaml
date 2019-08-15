@@ -3,7 +3,6 @@ inputs: # inputs for the flow {variable_name: value}
 
 outputs: # output of the flow [varialbe_name, ...]
   - labels
-  - imgs
 
 modules: # module to import
   - ops
@@ -12,6 +11,7 @@ flow:
   - # Load the YAML dataset cfg file
     f: load_yaml
     args: [path]
+    kwargs: []
     out: [classes, inputs, labels, root]
 
   - # Show the posibility to have subflows

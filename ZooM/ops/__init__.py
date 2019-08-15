@@ -1,3 +1,3 @@
 from .loaders import *
 from .savers import *
-from .ops import *
+from .tensors_ops import *

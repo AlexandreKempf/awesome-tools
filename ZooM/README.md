@@ -6,16 +6,19 @@
  - possibility of loops
 
 # Dataset
- - define by a yaml, with a list of paths and labels
+ - define by a yaml:
+    root: "path/to/dataset"
+    inputs: ["file", "file", ...]
+    labels: [0, 1, ...]
+    classes: [...]
  - config files should be saved when a Flow runs it
 
 # Ops
  - work with the conventions:
-  - img:
-  - mask:
-  - index:
-  - batch:
-  - bbox:
-  - point:
+  - img: (row, col, 3) float(0,1)
+  - mask: (row, col, 1) float(0,1)
+  - batch: (N, )
+  - bbox: (top, left, bottom, right)
+  - point: (top, left)
+
  - well documented
- -
