@@ -26,6 +26,6 @@ def save_image(image, mask, path, dirname=''):
     plt.imsave(os.path.join(dirname, path), data)
 
 
-def load_text(data, path, dirname='', mode='w'):
+def save_text(data, path, dirname='', mode='w'):
     with open(os.path.join(dirname, path), mode) as file:
         file.writelines(data)
