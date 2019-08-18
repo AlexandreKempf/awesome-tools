@@ -36,12 +36,17 @@ def exec_block(block, dico, ops):
 
 def exec_loop_block(block, dico, ops):
     variant = block.get('loop', [])
+    if isinstance(variant, int):
+        nb_loop = variant
+        variant = []
+    else:
+        nb_loop = len(dico[variant[0]])
     invariant = [arg for arg in block.get('args', []) if arg not in variant]
     dico_loop = {k: v for k, v in block.get('kwargs', {}).items()}
     dico_loop.update({k: deepcopy(dico[k]) for k in invariant})
     # TODO check that all variant have the same len
     out = {k: [] for k in block.get('out', [])}
-    for i in range(len(dico[variant[0]])):
+    for i in range(nb_loop):
         dico_loop.update({k: deepcopy(dico[k][i]) for k in variant})
         out_tmp = exec_block(block, dico_loop, ops)
         for k in out.keys():

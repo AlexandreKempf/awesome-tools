@@ -5,6 +5,7 @@ kwargs:
 
 modules: # module to import
   - ops
+  - models
 
 flow:
   - # Load the YAML dataset cfg file
@@ -27,6 +28,13 @@ flow:
       high: 0.2
     out: [imgs]
 
+  - # add a VGG model to the mix
+    f: VGG
+    kwargs:
+      blueprint: [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M']
+      nb_class: 4
+    out: [VGGmodel]
+
   - # save images
     f: save_image
     loop: [imgs, masks, inputs]
@@ -36,3 +44,4 @@ flow:
 
 out: # output of the flow [varialbe_name, ...]
   - labels
+  - VGGmodel

@@ -12,20 +12,28 @@ class _NumpyEncoder(json.JSONEncoder):
 
 
 def save_yaml(data, path, dirname=''):
-    with open(os.path.join(dirname, path), 'w') as file:
+    fullpath = os.path.join(dirname, path)
+    os.makedirs(os.path.dirname(fullpath), exist_ok=True)
+    with open(fullpath, 'w') as file:
         yaml.dump(data, file, default_flow_style=False)
 
 
 def save_json(data, path, dirname=''):
-    with open(os.path.join(dirname, path), 'w') as file:
+    fullpath = os.path.join(dirname, path)
+    os.makedirs(os.path.dirname(fullpath), exist_ok=True)
+    with open(fullpath, 'w') as file:
         json.dump(data, file, cls=_NumpyEncoder)
 
 
 def save_image(image, mask, path, dirname=''):
+    fullpath = os.path.join(dirname, path)
+    os.makedirs(os.path.dirname(fullpath), exist_ok=True)
     data = np.concatenate([image, np.expand_dims(mask, -1)], -1)
-    plt.imsave(os.path.join(dirname, path), data)
+    plt.imsave(fullpath, data)
 
 
 def save_text(data, path, dirname='', mode='w'):
-    with open(os.path.join(dirname, path), mode) as file:
+    fullpath = os.path.join(dirname, path)
+    os.makedirs(os.path.dirname(fullpath), exist_ok=True)
+    with open(fullpath, mode) as file:
         file.writelines(data)

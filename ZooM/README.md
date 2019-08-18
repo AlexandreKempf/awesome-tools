@@ -21,6 +21,7 @@
  - contains a DAG of Ops and a list of module import
  - should be saved everytime with the last git version of the import
  - integrated with MLflow
+ - can loop operator with the loop keywords (and or an int, or a list of variables to loop)
 
 # Dataset
  - define by a yaml:
@@ -39,3 +40,8 @@
     - point: (top, left)
 
  - well documented
+
+
+# TODO:
+ - versionning of the config files
+ - models config for DL
